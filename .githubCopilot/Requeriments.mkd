@@ -1,0 +1,59 @@
+# Librería de Manejo de Infraestructura ##
+## Requerimientos
+### Objetivo General
+
+Desarrollar una librería en JavaScript para la gestión de espacios físicos (salas, oficinas, estacionamientos, bodegas, etc.), que permita administrar la ocupación, disposición y estado de dichos espacios de manera sencilla, flexible y escalable. La librería será open source con licencia MIT para permitir futuras contribuciones y adaptaciones.
+
+### Alcance Inicial
+
+El proyecto tendrá las siguientes características principales en su versión inicial (MVP):
+    - Usable desde cualquier proyecto JavaScript o framework frontend moderno.
+    - Renderización gráfica mediante Konva.js sobre un canvas HTML5.
+    - Mantener todo el estado del mapa/espacio en un documento de estado único (State Document).
+    - Permitir adición, modificación y remoción de elementos espaciales.
+    - Permitir actualización de estado de cada espacio (ocupado, libre, reservado, en mantenimiento, etc.).
+    - Facilitar la consulta del estado actual de cualquier espacio o conjunto de espacios.
+    - Ser modular y extensible para futuras integraciones como conexión con APIs externas o soporte para persistencia remota.
+
+### Requerimientos Funcionales
+3.1. Estructura del Documento de Estado (State Document)
+    Deberá contener:
+        - Identificador único de cada espacio.
+        - Tipo de espacio (sala, cubículo, estacionamiento, etc.).
+        - Estado actual (ej.: libre, ocupado, reservado).
+        - Propiedades gráficas (posición, dimensiones, color, etiqueta, etc.).
+        - Propiedades adicionales extensibles (capacidad, restricciones, metadatos personalizados).
+
+3.2. API Pública de la Librería
+    - addSpace(spaceConfig): Agrega un nuevo espacio al documento de estado y lo renderiza en el canvas mediante Konva.
+    - removeSpace(spaceId): Elimina un espacio dado su ID, actualiza el documento de estado y elimina la representación gráfica.
+    - updateSpace(spaceId, newConfig): Actualiza propiedades o estado de un espacio y refleja los cambios en la renderización.
+    - getSpace(spaceId): Retorna información completa de un espacio.
+    - listSpaces(filter?): Lista todos los espacios, con posibilidad de filtrar por estado, tipo u otros atributos.
+    - resetState(): Restablece el documento de estado y limpia el canvas.
+
+3.3. Validación de Datos
+    Validación de:
+        - IDs únicos.
+        - Estados válidos predefinidos.
+        - Estructura mínima requerida en spaceConfig.
+        - Valores numéricos correctos para posición y dimensiones (para Konva).
+
+### Requerimientos No Funcionales
+    - Modularidad: La arquitectura deberá permitir agregar módulos opcionales (renderizado, sincronización con backend, etc.).
+    - Documentación: Se requiere documentación clara para desarrolladores externos (README, API Docs).
+    - Performance: Operaciones básicas (agregar, eliminar, actualizar, consultar) deben ejecutarse con complejidad O(1) u O(n) en el peor de los casos.
+    - Testing: La librería incluirá un conjunto básico de pruebas unitarias.
+    - Escalabilidad: La estructura del documento de estado y la API deben anticipar la integración futura de:
+        - Gestión de capas visuales.
+        - Soporte para múltiples mapas/espacios simultáneos.
+        - Eventos y suscriptores (pattern observer).
+
+### Consideraciones Técnicas
+    - Consideraciones Técnicas
+    - Lenguaje: JavaScript (ES6+).
+    - Renderizado: Konva.js (HTML5 Canvas).
+    - Entorno: Compatible con Node.js y navegadores.
+    - Distribución: NPM Package.
+    - Empaquetado: Vite / Rollup recomendado.
+    - Licencia: MIT.
