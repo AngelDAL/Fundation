@@ -1,4 +1,4 @@
-# SpaceManager.js
+# Fundation.js
 
 Una librería open source en JavaScript para la gestión y visualización de espacios físicos usando [Konva.js](https://konvajs.org/).
 
