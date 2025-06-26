@@ -5,15 +5,537 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        #controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.315);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .control-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button.danger {
+            background-color: #dc3545;
+        }
+
+        button.danger:hover {
+            background-color: #c82333;
+        }
+
+        button.success {
+            background-color: #28a745;
+        }
+
+        button.success:hover {
+            background-color: #218838;
+        }
+
+        input,
+        select {
+            padding: 5px;
+            margin: 2px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            gap: 5px;
+        }
+
+        .input-group label {
+            min-width: 60px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        #container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: calc(100% - 390px);
+            height: 100vh;
+            width: 100vw;
+
+            border: 1px solid #ccc;
+            background-color: white;
+        }
+
+        #info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 300px;
+        }
+
+        .color-input {
+            width: 40px;
+            height: 30px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div id="container" style="height: 400px; width: 100%;;">
+    <div id="controls">
+        <!-- Sección de Fondo -->
+        <div class="control-section">
+            <h3>🎨 Fondo</h3>
+            <button onclick="addBackgroundWithParams()" class="success">Agregar Fondo</button>
+            <div class="input-group">
+                <label>Color:</label>
+                <input type="color" id="bgColor" value="#lightgrey" class="color-input">
+            </div>
+        </div>
 
+        <!-- Sección de Rectángulos -->
+        <div class="control-section">
+            <h3>🔲 Rectángulos</h3>
+            <button onclick="addRectWithParams()">Crear Rectángulo</button>
+            <button onclick="addRectWithImage()">Rect. con Imagen</button>
+
+            <div class="input-group">
+                <label for="rectX">X:</label> <input type="number" id="rectX" value="100" min="0">
+            </div>
+            <div class="input-group">
+                <label>Y:</label> <input type="number" id="rectY" value="100" min="0">
+            </div>
+
+            <div class="input-group">
+                <label>Ancho:</label> <input type="number" id="rectWidth" value="100" min="1">
+            </div>
+            <div class="input-group">
+                <label>Alto:</label> <input type="number" id="rectHeight" value="100" min="1">
+            </div>
+
+            <div class="input-group">
+                <label>Color:</label>
+                <input type="color" id="rectColor" value="#007bff" class="color-input">
+                <input type="checkbox" id="rectDraggable" checked>
+                <label>Arrastrable</label>
+            </div>
+        </div>
+
+        <!-- Sección de Layers -->
+        <div class="control-section">
+            <h3>📋 Capas (Layers)</h3>
+            <button onclick="addLayerWithName()" class="success">Crear Capa</button>
+            <button onclick="showLayerInfo()">Info Capas</button>
+
+            <div class="input-group">
+                <label>Nombre:</label>
+                <input type="text" id="layerName" value="Nueva Capa" placeholder="Nombre de la capa">
+            </div>
+
+            <div class="input-group">
+                <label>Seleccionar:</label>
+                <select id="layerSelect" onchange="setSelectedLayer()">
+                    <option value="">Seleccionar capa...</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <input type="number" id="layerIndex" value="0" min="0" placeholder="Índice">
+                <button onclick="setLayerByIndex()">Ir a Capa</button>
+                <button onclick="removeLayerByIndex()" class="danger">Eliminar</button>
+            </div>
+        </div>
+
+        <!-- Sección de Información -->
+        <div class="control-section">
+            <h3>ℹ️ Información</h3>
+            <button onclick="getCurrentLayerInfo()">Capa Actual</button>
+            <button onclick="getRectCount()">Contar Rects</button>
+            <button onclick="clearCanvas()" class="danger">Limpiar Todo</button>
+        </div>
+
+        <!-- Sección de Configuración -->
+        <div class="control-section">
+            <h3>⚙️ Configuración</h3>
+            <div class="input-group">
+                <label>Escala X:</label>
+                <input type="number" id="scaleX" value="1" step="0.1" min="0.1" max="3">
+            </div>
+            <div class="input-group">
+                <label>Escala Y:</label>
+                <input type="number" id="scaleY" value="1" step="0.1" min="0.1" max="3">
+            </div>
+            <button onclick="applyScale()">Aplicar Escala</button>
+        </div>
+
+        <!-- Sección de Configuración -->
+        <div class="control-section">
+            <h3>🗺️ Map</h3>
+            <div class="input-group">
+                <label>X:</label>
+                <input type="number" id="PositionX" value="1">
+            </div>
+            <div class="input-group">
+                <label>Y:</label>
+                <input type="number" id="PositionY" value="1">
+            </div>
+            <button onclick="applyPosition()">Aplicar Posición</button>
+        </div>
+
+        <!-- Sección de Historial -->
+        <div class="control-section">
+            <h3>📜 Historial</h3>
+            <button onclick="undo()">Deshacer</button>
+            <button onclick="redo()">Rehacer</button>
+        </div>
     </div>
+
+    <div id="container"></div>
+
+    <div id="info">
+        <div id="statusInfo">Estado: Listo</div>
+        <div id="layerInfo">Capa actual: -</div>
+        <div id="rectInfo">Rectángulos: 0</div>
+    </div>
+
     <script src="../node_modules/konva/konva.min.js"></script>
     <script src="../src/fundation.js"></script>
+    <script>
+        // Variables globales
+        let mapita2;
+
+        // Inicializar el mapa al cargar la página
+        window.addEventListener('load', function () {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            try {
+                mapita2 = MapInit();
+                updateStatus('Aplicación inicializada correctamente');
+                updateLayerSelect();
+                updateInfo();
+            } catch (error) {
+                console.error('Error al inicializar:', error);
+                updateStatus('Error al inicializar la aplicación');
+            }
+        }
+
+        // Funciones de Fondo
+        function addBackgroundWithParams() {
+            try {
+                const color = document.getElementById('bgColor').value;
+                mapita2.addBackground({ fill: color });
+                updateStatus('Fondo agregado con color: ' + color);
+            } catch (error) {
+                console.error('Error al agregar fondo:', error);
+                updateStatus('Error al agregar fondo');
+            }
+        }
+
+        // Funciones de Rectángulos
+        async function addRectWithParams() {
+            try {
+                const params = {
+                    x: parseInt(document.getElementById('rectX').value),
+                    y: parseInt(document.getElementById('rectY').value),
+                    width: parseInt(document.getElementById('rectWidth').value),
+                    height: parseInt(document.getElementById('rectHeight').value),
+                    fill: document.getElementById('rectColor').value,
+                    draggable: document.getElementById('rectDraggable').checked
+                };
+
+                await mapita2.addRect(params);
+                updateStatus(`Rectángulo creado en (${params.x}, ${params.y})`);
+                updateInfo();
+            } catch (error) {
+                console.error('Error al crear rectángulo:', error);
+                updateStatus('Error al crear rectángulo');
+            }
+        }
+
+        async function addRectWithImage() {
+            try {
+                const params = {
+                    x: parseInt(document.getElementById('rectX').value),
+                    y: parseInt(document.getElementById('rectY').value),
+                    width: parseInt(document.getElementById('rectWidth').value),
+                    height: parseInt(document.getElementById('rectHeight').value),
+                    fill: "url(../src/Image.jpg)",
+                    draggable: document.getElementById('rectDraggable').checked
+                };
+                await mapita2.addRect(params);
+                updateStatus('Rectángulo con imagen creado');
+                updateInfo();
+            } catch (error) {
+                console.error('Error al crear rectángulo con imagen:', error);
+                updateStatus('Error al crear rectángulo con imagen');
+            }
+        }
+
+        // Funciones de Capas
+        function addLayerWithName() {
+            try {
+                const name = document.getElementById('layerName').value || 'Nueva Capa';
+                mapita2.addLayer({ name: name });
+                updateStatus('Capa creada: ' + name);
+                updateLayerSelect();
+                updateInfo();
+            } catch (error) {
+                console.error('Error al crear capa:', error);
+                updateStatus('Error al crear capa');
+            }
+        }
+
+        function setSelectedLayer() {
+            try {
+                const select = document.getElementById('layerSelect');
+                const index = parseInt(select.value);
+                if (!isNaN(index)) {
+                    mapita2.setLayer(index);
+                    updateStatus('Cambiado a capa: ' + index);
+                    updateInfo();
+                }
+            } catch (error) {
+                console.error('Error al cambiar capa:', error);
+                updateStatus('Error al cambiar capa');
+            }
+        }
+
+        function setLayerByIndex() {
+            try {
+                const index = parseInt(document.getElementById('layerIndex').value);
+                mapita2.setLayer(index);
+                updateStatus('Cambiado a capa: ' + index);
+                updateInfo();
+                updateLayerSelect();
+            } catch (error) {
+                console.error('Error al cambiar capa:', error);
+                updateStatus('Error al cambiar capa');
+            }
+        }
+
+        function removeLayerByIndex() {
+            try {
+                const index = parseInt(document.getElementById('layerIndex').value);
+                const success = mapita2.removeLayer(index);
+                if (success) {
+                    updateStatus('Capa eliminada: ' + index);
+                    updateLayerSelect();
+                    updateInfo();
+                } else {
+                    updateStatus('Error al eliminar capa');
+                }
+            } catch (error) {
+                console.error('Error al eliminar capa:', error);
+                updateStatus('Error al eliminar capa');
+            }
+        }
+
+        // Funciones de Información
+        function showLayerInfo() {
+            try {
+                const info = mapita2.getLayerInfo();
+                console.log('Información de capas:', info);
+                let message = `Total de capas: ${info.totalLayers}\\n`;
+                message += `Capa actual: ${info.currentLayerIndex}\\n\\n`;
+                message += 'Detalles de capas:\\n';
+                info.layers.forEach(layer => {
+                    message += `${layer.index}: ${layer.name} (${layer.children} elementos)\\n`;
+                });
+                alert(message);
+                updateStatus('Información de capas mostrada');
+            } catch (error) {
+                console.error('Error al obtener info de capas:', error);
+                updateStatus('Error al obtener información');
+            }
+        }
+
+        function getCurrentLayerInfo() {
+            try {
+                const currentLayer = mapita2.getLayer();
+                if (currentLayer) {
+                    const info = `Capa actual: ${currentLayer.getAttr('name') || 'Sin nombre'}`;
+                    alert(info);
+                    updateStatus('Info de capa actual mostrada');
+                } else {
+                    alert('No hay capa actual seleccionada');
+                }
+            } catch (error) {
+                console.error('Error al obtener capa actual:', error);
+                updateStatus('Error al obtener capa actual');
+            }
+        }
+
+        function getRectCount() {
+            try {
+                // Acceder al Status global
+                const count = Status.rects.length;
+                alert(`Total de rectángulos: ${count}`);
+                updateStatus(`Total de rectángulos: ${count}`);
+            } catch (error) {
+                console.error('Error al contar rectángulos:', error);
+                updateStatus('Error al contar rectángulos');
+            }
+        }
+
+        function clearCanvas() {
+            if (confirm('¿Estás seguro de que quieres limpiar todo el canvas?')) {
+                try {
+                    // Reinicializar la aplicación
+                    initializeApp();
+                    updateStatus('Canvas limpiado');
+                } catch (error) {
+                    console.error('Error al limpiar canvas:', error);
+                    updateStatus('Error al limpiar canvas');
+                }
+            }
+        }
+
+        // Funciones de Configuración
+        function applyScale() {
+            try {
+                const scaleX = parseFloat(document.getElementById('scaleX').value);
+                const scaleY = parseFloat(document.getElementById('scaleY').value);
+                // Esta función requeriría ser implementada en fundation.js
+                updateStatus(`Escala aplicada: X=${scaleX}, Y=${scaleY}`);
+            } catch (error) {
+                console.error('Error al aplicar escala:', error);
+                updateStatus('Error al aplicar escala');
+            }
+        }
+
+        // Funciones de Utilidad
+        function updateStatus(message) {
+            document.getElementById('statusInfo').textContent = 'Estado: ' + message;
+        }
+
+        function updateLayerSelect() {
+            try {
+                const select = document.getElementById('layerSelect');
+                select.innerHTML = '<option value="">Seleccionar capa...</option>';
+
+                const info = mapita2.getLayerInfo();
+                info.layers.forEach(layer => {
+                    const option = document.createElement('option');
+                    option.value = layer.index;
+                    option.textContent = `${layer.index}: ${layer.name} (${layer.children} elementos)`;
+                    if (layer.index === info.currentLayerIndex) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al actualizar select de capas:', error);
+            }
+        }
+
+        function updateInfo() {
+            try {
+                const layerInfo = mapita2.getLayerInfo();
+                document.getElementById('layerInfo').textContent =
+                    `Capa actual: ${layerInfo.currentLayerIndex >= 0 ? layerInfo.currentLayerIndex : 'Ninguna'}`;
+                document.getElementById('rectInfo').textContent =
+                    `Rectángulos: ${Status.rects.length}`;
+            } catch (error) {
+                console.error('Error al actualizar info:', error);
+            }
+        }
+
+        function applyPosition() {
+            try {
+                const x = parseFloat(document.getElementById('PositionX').value);
+                const y = parseFloat(document.getElementById('PositionY').value);
+                mapita2.setPosition(x, y);
+                updateStatus(`Posición aplicada: (${x}, ${y})`);
+            } catch (error) {
+                console.error('Error al aplicar posición:', error);
+                updateStatus('Error al aplicar posición');
+            }
+        }
+
+        function undo() {
+            try {
+                mapita2.undo();
+                updateStatus('Acción deshecha');
+                updateInfo();
+            } catch (error) {
+                console.error('Error al deshacer:', error);
+                updateStatus('Error al deshacer');
+            }
+        }
+
+        function redo() {
+            try {
+                mapita2.redo();
+                updateStatus('Acción rehecha');
+                updateInfo();
+            } catch (error) {
+                console.error('Error al rehacer:', error);
+                updateStatus('Error al rehacer');
+            }
+        }
+
+        // Actualizar información cada 2 segundos
+        setInterval(updateInfo, 2000);
+    </script>
 
 </body>
 
